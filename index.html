@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+
+        <title>The Go Programming Language</title>
+
+        <meta name="description" content="">
+        <meta name="author" content="Lars de Ridder">
+
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <link rel="stylesheet" href="css/reveal.min.css">
+        <link rel="stylesheet" href="css/theme/moon.css" id="theme">
+
+        <!-- For syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+
+        <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+        <script>
+            if( window.location.search.match( /print-pdf/gi ) ) {
+                var link = document.createElement( 'link' );
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = 'css/print/pdf.css';
+                document.getElementsByTagName( 'head' )[0].appendChild( link );
+            }
+        </script>
+
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
+
+    <body>
+
+        <div class="reveal">
+
+            <!-- Any section element inside of this container is displayed as a slide -->
+            <div class="slides">
+                <section>
+                    <h1>The Go Programming Language</h1>
+                </section>
+
+                <section>
+                    <h2>Some questions for you!</h2>
+                    <ul>
+                        <li class="fragment">Who heard of Go?</li>
+                        <li class="fragment">Who kind of looked at Go?</li>
+                        <li class="fragment">Who wrote something in Go?</li>
+                        <li class="fragment">Who wrote something non-trivial in Go?</li>
+                        <li class="fragment">Who wrote a web application in Go?</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Table of contents</h2>
+                    <ul>
+                        <li>Overview of Go + the basics</li>
+                        <li>Demo #1 - <a target="_blank" href="https://github.com/todayispotato/goreplace">Goreplace</a></li>
+                        <li>Object orientation</li>
+                        <li>Interesting bits</li>
+                        <li>Concurrency</li>
+                        <li>Demo #2 - <a target="_blank" href="https://github.com/todayispotato/gotactoe">GoTacToe</a></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Short overview of Go</h2>
+                    <ul>
+                        <li>Static typing</li>
+                        <li>Compiled (not to bytecode)</li>
+                        <li>Garbage collected</li>
+                        <li>Concurrent!</li>
+                        <li>Open Source (BSD style license)</li>
+                        <li>Horrible to Google (use Golang instead)</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Why Go?</h2>
+                    </section>
+                    <section>
+                        <h2>C is almost 40 year old</h2>
+                        <p>and has its issues</p>
+                    </section>
+                    <section>
+                        <h2>No other language fits the same niche</h2>
+                        <p>Try doing systems programming with Java</p>
+                    </section>
+                    <section>
+                        <h2>There's still no real alternative for C</h2>
+                        <p class="fragment">And Rob Pike had nothing to do</p>
+                    </section>
+                </section>
+
+                <section>
+                    <h2>Hello world</h2>
+                    <pre><code contenteditable>
+package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("Hello World!")
+}
+                        </code></pre>
+                </section>
+
+                <!-- BASICS -->
+
+                <section data-background="#8c4738" data-transition="linear" data-background-transition="slide">
+                    <h1>Basics</h1>
+                </section>
+
+                <section>
+                    <h2>Defining vars</h2>
+                    <pre><code class="go" contenteditable>
+// These are all equivalent
+index := 5
+var answer = 42
+var eight int // 0
+eight = 8
+                    </code></pre>
+                    <h3>And constants</h3>
+                    <pre><code class="go" contenteditable>
+const BALL = 3
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Functions</h2>
+                    <pre><code class="go" contenteditable>
+func concat(a string, b string) string {
+    return a + b
+}
+                    </code></pre>
+
+                    <h3>First class citizens</h3>
+                    <pre><code class="go" contenteditable>
+func doStuffWithInts(someFunc func(int, int) int, a int, b int) int {
+    return someFunc(a, b)
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Arrays, slices and maps</h2>
+                    </section>
+                    <section>
+                        <h2>Array</h2>
+                        <pre><code class="go" contenteditable>
+var numbers [2]int
+numbers[0] = 1
+numbers[1] = 2
+numbers[2] = 3 // Compile time error: Out of bounds
+numbers = append(numbers, 3) // Compile time error: Invalid argument
+                        </code></pre>
+                        <p>Good to have, but you'll hardly ever use them</p>
+                    </section>
+                    <section>
+                        <h2>Slices part 1</h2>
+                        <pre><code class="go" contenteditable>
+chars := make([]byte, 2)
+chars[0] = 'a'
+chars[1] = 'b'
+chars[2] = 'c' // Runtime error: Index out of range
+chars = append(chars, 'c') // This is fine
+chars[2] = 'c' // And now this is as well
+                        </code></pre>
+                        <p>Like Python's list</p>
+                    </section>
+                    <section>
+                        <h2>Slices part 2</h2>
+                        <pre><code class="go" contenteditable>
+hello := []string{"h", "e", "l", "l", "o"}
+fmt.Println(hello[1:len(hello)]) // "[e l l o]"
+                        </code></pre>
+                        <p>Slices are a wrapper around an underlying array</p>
+                        <pre><code class="go" contenteditable>
+bello := hello
+bello[0] = "b"
+fmt.Println(bello) // "[b e l l o]"
+fmt.Println(hello) // "[b e l l o]"
+
+yello := make([]string, len(hello))
+copy(yello, bello)
+yello[0] = "y"
+fmt.Println(yello) // "[y e l l o]"
+fmt.Println(bello) // "[b e l l o]"
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>Map</h2>
+                        <pre><code class="go" contenteditable>
+func main() {
+    numToString := make(map[int]string)
+    numToString[0] = "a"
+    numToString[1] = "b"
+    // or numToString := map[int]string{0: "a", 1: "b"}
+    fmt.Println(numToString) // "map[0:a 1:b]"
+
+    value := numToString[1]
+    fmt.Println(value) // b
+
+    _, ok := numToString[5]
+    fmt.Println(ok) // false
+}
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section>
+                    <h2>Pointers</h2>
+                    <p>There are pointers, but no pointer arithmetic (guess why)</p>
+                    <pre><code class="go" contenteditable>
+func main() {
+	question := "How many roads lead to Rome?"
+	var ptr *string
+	ptr = &question
+	fmt.Println(ptr) // "0xc21000a380"
+	fmt.Println(*ptr) // "How many roads lead to Rome?"
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Packages</h2>
+                    <ul>
+                        <li>Function like namespaces, one per folder</li>
+                        <li>Entry point is package main, package main has no more than one function main</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Function visibility: First letter decides</h2>
+                    <pre><code class="go" contenteditable>
+package somepackage
+
+// Private
+func invisible() { ... }
+
+// Public
+func Visible() { ... }
+                    </code></pre>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Error handling</h2>
+                    </section>
+                    <section>
+                        <h2>No exceptions</h2>
+                        <blockquote>We believe that coupling exceptions to a control structure, as in the try-catch-finally idiom, results in convoluted code. It also tends to encourage programmers to label too many ordinary errors, such as failing to open a file, as exceptional.</blockquote>
+                    </section>
+                    <section>
+                        <h2>Multiple return values</h2>
+                        <pre><code class="go" contenteditable>
+if file, err := ioutil.ReadFile(filename); err != nil {
+    if os.IsNotExist(err) {
+        fmt.Printf("%s doesn't exist, silly!\n", filename)
+        return
+    }
+    panic(err)
+}
+fmt.Println(string(file))
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section>
+                    <h2>Tools</h2>
+                    <ul>
+                        <li>go run - Compile and execute</li>
+                        <li>go build - Create binary</li>
+                        <li>go install - Install binary on $GOPATH/bin</li>
+                        <li>godoc - Find docs for anything (integrate in editor!)</li>
+                        <li>gofmt - Format all files via a standard format (they use tabs :()</li>
+                        <li>go get - Install library / app from github, bitbucket, etc</li>
+                    </ul>
+                </section>
+
+                <section data-background="#4d7e65">
+                    <h2>Demo time: <a target="_blank" href="https://github.com/todayispotato/goreplace">Goreplace</a></h2>
+                </section>
+
+                <!-- OBJECT ORIENTATION -->
+
+                <section data-background="#8c4738" data-background-transition="slide" data-transition="linear">
+                    <h1>Object orientation</h1>
+                </section>
+
+                <section>
+                    <h2><strike>Classes and objects</strike> Types and values</h2>
+                </section>
+                <section>
+                    <h2>Let's create a <strike>class</strike> type with value struct</h2>
+                    <pre><code class="go" contenteditable>
+type Paylogician struct {
+    name    string
+    country string
+    team    string
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Define ye olde method</h2>
+                    <pre><code class="go" contenteditable>
+func (p *Paylogician) String() string {
+    return fmt.Sprintf("%s from %s does some stuff in the %s team", 
+        p.name, p.country, p.team)
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Give me an instance!</h2>
+                    <pre><code class="go" contenteditable>
+func main() {
+    oleg := Paylogician{name: "Oleg", country: "UKRAIN", team: "Interfaces"}
+    fmt.Println(&oleg)
+    // Oleg from UKRAIN does some stuff in the Interfaces team
+
+    siebejan := new(Paylogician) // Allocate pointer to zeroed memory
+    fmt.Println(siebejan.name) // This is ""
+    siebejan.name = "Siebe Jan"
+    siebejan.country = "Fryslân"
+    siebejan.team = "Services"
+    fmt.Println(siebejan)
+    // "Siebe Jan from Fryslân does some stuff in the Services team"
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <h2>Methods are defined on <strong>types</strong></h2>
+                    <pre><code class="go" data-trim contenteditable>
+type Team int
+
+type Paylogician2 struct {
+    name    string
+    country string
+    team    Team
+}
+
+func (t Team) String() string {
+    return teamToString[t]
+}
+
+func main() {
+    spyros := Paylogician2{name: "Spyros", country: "Ελλάδα", team: CORE}
+    fmt.Println(&spyros)
+    // "Spyros from Ελλάδα does some stuff in the Core team"
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>No inheritance, but composition</h2>
+                        <pre><code class="go" data-trim contenteditable>
+type Person struct {
+    name    string
+    country string
+}
+type Paylogician3 struct {
+    Person
+    team Team
+}
+func (p *Paylogician3) String() string {
+    return fmt.Sprintf("%s from %s does some stuff in the %s team", 
+        p.name, p.country, p.team)
+}
+func main() {
+    egon := Paylogician3{Person{name: "Egon", country: "Nederland"}, OPIT}
+    fmt.Println(&egon)
+    // "Egon from Nederland does some stuff in the Operational IT team"
+}
+                        </code></pre>
+                    </section>
+                    <section>
+                        <h2>Embedding != inheritance</h2>
+                        <pre><code class="go" contenteditable>
+func (p *Person) String() string {
+    // This won't work, as p.team is undefined for type Person
+    return fmt.Sprintf("%s from %s does some stuff in the %s team", 
+        p.name, p.country, p.team)
+}
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section>
+                    <h2>Interfaces</h2>
+                    <pre><code class="go" data-trim contenteditable>
+type Serializer interface {
+	Serialize()
+}
+func (p *Paylogician3) Serialize() string {
+    return fmt.Sprintf("{ 'name': '%s', 'country': '%s', 'team': '%s' }", 
+        p.name, p.country, p.team)
+}
+func serializeMe(s Serializer) string {
+	return s.Serialize()
+}
+func main() {
+    wouter := Paylogician3{
+        Person{name: "Wouter", country: "Nederland"}, SERVICES,
+    }
+    fmt.Println(serializeMe(&wouter))
+    // "{ 'name': 'Wouter', 'country': 'Nederland', 'team': 'Services' }"
+}
+                    </code></pre>
+                    <p>Interfaces are satisfied <em>implicitly</em></p>
+                </section>
+
+                <!-- INTERESTING BITS -->
+
+                <section data-background="#8c4738" data-background-transition="slide" data-transition="linear">
+                    <h1>Interesting bits</h1>
+                </section>
+
+                <section>
+                    <h2>Enums (kind of)</h2>
+                    <pre><code class="go" contenteditable>
+type Team int
+
+const (
+    SERVICES Team = iota
+    INTERFACES
+    CORE
+    OPIT
+)
+
+func main() {
+    fmt.Println("%d, %d", SERVICES, CORE) // "0, 2"
+}
+                    </code></pre>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Defer, panic, recover</h2>
+                    </section>
+
+                    <section>
+                        <h2>Defer</h2>
+                        <p>Execute function before the executing function returns</p>
+                        <pre><code class="go" contenteditable>
+func deferMe() {
+    defer func() {
+        fmt.Print(" World")
+    }()
+    fmt.Print("Hello")
+}
+
+func main() {
+    deferMe() // "Hello World"
+}
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>Do or do not panic</h2>
+                        <p>Report error as unrecoverable: game-over type exception</p>
+                        <pre><code class="go" contenteditable>
+func checkAnswer(answer int) {
+    if answer != 42 {
+        panic("NOOO!!")
+    }
+    fmt.Println(answer)
+}
+func main() {
+    checkAnswer(41)
+    fmt.Println("That was the right answer!") // This never happens
+}
+                        </code></pre>
+                    </section>
+
+                    <section>
+                        <h2>Recover</h2>
+                        <p>Panic unwinds stack, only code to execute while unwinding stack is in defer, so recover can only happen from defer</p>
+                        <pre><code class="go" data-trim contenteditable>
+func checkAnswer(answer int) {
+    if answer != 42 {
+        panic("NOOO!!")
+    }
+    fmt.Println(answer)
+}
+func goPanicAndRecover() {
+    defer func() {
+        if err := recover(); err != nil {
+            fmt.Println("Keep calm and eat your sushi")
+        }
+    }()
+    checkAnswer(42) // "42"
+    checkAnswer(41) // "Keep calm and eat your sushi"
+    checkAnswer(43) // This never happens
+}
+func main() {
+    goPanicAndRecover()
+    fmt.Println("Phew, that was close.") // Is now executed
+}
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Generic types</h2>
+                        <p>There are none (but might be implemented at some point)</p>
+                    </section>
+                    <section>
+                        <h2>interface{}</h2>
+                        <p>The interface with no methods (so any Type)</p>
+                        <pre><code class="go" data-trim contenteditable>
+func stringOrInt(i int) interface{} {
+    if i < 0 {
+        return "negative"
+    }
+    return i
+}
+
+func main() {
+    if val, ok := stringOrInt(1).(int); ok {
+        fmt.Printf("Int: %d\n", val) // "Int: 1"
+    }
+    if val, ok := stringOrInt(-1).(string); ok {
+        fmt.Printf("String: %s\n", val) // "String: negative"
+    }
+}
+                        </code></pre>
+                        <q>"Even though the dynamic type of val is known only at run time, the type of val.(T) is known to be T in a correct program."</q>
+                    </section>
+                </section>
+
+                <!-- CONCURRENCY -->
+
+                <section data-background="#8c4738" data-background-transition="slide" data-transition="linear">
+                    <h1>Concurrency</h1>
+                    <blockquote>Do not communicate by sharing memory; instead, share memory by communicating.</blockquote>
+                    <p>Based on Hoare's Communicating Sequential Processes (CSP), like Erlang</p>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Concurrency is not parallelism</h2>
+                    </section>
+                    <section>
+                        <p>Concurrency: Programming as the composition of independently executing processes</p>
+                        <p>Parallelism: Programming as the simultaneous execution of (possibly related) computations</p>
+                    </section>
+                    <section>
+                        <p>Concurrency provides a way to structure a solution to solve a problem that may (but not necessarily) be parallelizable.</p>
+                    </section>
+                    <section>
+                        <h2>Initial design</h2>
+                        <img src="http://talks.golang.org/2012/waza/gophersimple1.jpg"/>
+                    </section>
+                    <section>
+                        <h2>Parallelize</h2>
+                        <img src="http://talks.golang.org/2012/waza/gophersimple2.jpg"/>
+                        <p>Problem: Bottlenecks and synchronization needed</p>
+                    </section>
+                    <section>
+                        <h2>Concurrency</h2>
+                        <img src="http://talks.golang.org/2012/waza/gophersimple4.jpg"/>
+                        <p>Remove bottleneck - concurrent composition!</p>
+                        <p>Not necessarily parallel (if only one gopher moves at the same time), but it IS concurrent</p>
+                    </section>
+                    <section>
+                        <h2>Another design</h2>
+                        <img src="http://talks.golang.org/2012/waza/gophercomplex1.jpg"/>
+                        <p>Potentially four times faster than the single gopher</p>
+                    </section>
+                    <section>
+                        <h2>Parallelize it</h2>
+                        <img src="http://talks.golang.org/2012/waza/gophercomplex2.jpg"/>
+                    </section>
+                    <section>
+                        <h2>Yet another design</h2>
+                        <img src="http://talks.golang.org/2012/waza/gophercomplex3.jpg"/>
+                    </section>
+                    <section>
+                        <h2>Concurrent and parallel masterpiece</h2>
+                        <img src="http://talks.golang.org/2012/waza/gophercomplex6.jpg"/>
+                    </section>
+                    <section>
+                        <h2>What about computers?</h2>
+                        <p>Substitute:</p>
+                        <p>books for web pages,</p>
+                        <p>gopher for CPU,</p>
+                        <p>cart for marshaling and rendering,</p>
+                        <p>incinerator for browser,</p>
+                        <p>and we just designed a concurrent scalable web service!</p>
+                    </section>
+                </section>
+
+                <section>
+                    <h2>Goroutines</h2>
+                    <p>A function executing concurrently with other goroutines in the same address space</p>
+                    <pre><code class="go" contenteditable>
+go func() {
+    time.Sleep(time.Second * 2)
+    fmt.Println("...no")
+}()
+fmt.Println("Are you awake?")
+// "Are you awake?"
+// A bit later...
+// "...no"
+                    </code></pre>
+                    <p>They're very cheap (not free, but cheap); it's common to have thousands in one program</p>
+                </section>
+
+                <section>
+                    <section>
+                        <h2>Channels</h2>
+                    </section>
+
+                    <section>
+                        <h2>The communications part</h2>
+                        <pre><code class="go" contenteditable>
+ch := make(chan bool) // Typed!
+go func(ch chan bool) {
+    time.Sleep(time.Second * 2)
+    fmt.Println("...no")
+    ch <- true
+}(ch)
+fmt.Println("Are you awake?")
+<-ch // Go waits for anything to come in to ch before continuing
+fmt.Println("Stop being lazy.")
+                        </code></pre>
+                        <p>They're first-class values as well!</p>
+                    </section>
+
+                    <section>
+                        <h2>Select</h2>
+                        <p>Execute whichever channel is ready</p>
+                        <pre><code class="go" data-trim contenteditable>
+func reportForDuty(name string, laziness int, ch chan string) {
+    time.Sleep(time.Second * time.Duration(laziness))
+    ch <- name
+}
+
+func main() {
+    first := make(chan string)
+    go reportForDuty("Jimmy", 3, first)
+    second := make(chan string)
+    go reportForDuty("Timmy", 1, second)
+
+    var output string
+    for i := 0; i < 2; i++ {
+        select {
+        case name := <-first:
+            output += name
+        case name := <-second:
+            output += name
+        }
+    }
+    fmt.Println(output) // "TimmyJimmy"
+}
+                        </code></pre>
+                    </section>
+                </section>
+
+                <section data-background="#4d7e65">
+                    <h2>Demo time: <a target="_blank" href="https://github.com/todayispotato/gotactoe">GoTacToe</a></h2>
+                    <p><a target="_blank" href="http://goo.gl/mbjiHm">http://goo.gl/mbjiHm</a></p>
+                </section>
+
+                <section data-background="#8c4738" data-background-transition="slide" data-transition="linear">
+                    <h1>Closing up</h1>
+                </section>
+
+                <section>
+                    <h2>What to use Go for</h2>
+                    <ul>
+                        <li>Whenever you would use C, consider Go</li>
+                        <li>Tools for devs</li>
+                        <li>Performance critical systems</li>
+                        <li>Concurrency heavy applications</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Some thoughts</h2>
+                    <ul>
+                        <li>Loads of things built in</li>
+                        <li>Tooling is very mature</li>
+                        <li>Conventions are well established</li>
+                        <li>Documentation is a bit meh</li>
+                        <li>Compiler is helpful but kind of whiny</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Links</h2>
+                    <ul>
+                        <li>Getting started: <a target="_blank" href="http://golang.org/">http://golang.org/</a></li>
+                        <li>Effective Go: <a target="_blank" href="http://golang.org/doc/effective_go.html">http://golang.org/doc/effective_go.html</a></li>
+                        <li>Go playground: <a target="_blank" href="http://play.golang.org/">http://play.golang.org/</a></li>
+                        <li>Go FAQ: <a target="_blank" href="https://golang.org/doc/faq">https://golang.org/doc/faq</a></li>
+                        <li>Rob Pike - 'Concurrency is not parallelism': <a target="_blank" href="http://vimeo.com/49718712">http://vimeo.com/49718712</a></li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Questions?</h2>
+                </section>
+
+            </div>
+
+        </div>
+
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.min.js"></script>
+
+        <script>
+
+        // Full list of configuration options available here:
+        // https://github.com/hakimel/reveal.js#configuration
+        Reveal.initialize({
+            controls: true,
+            progress: true,
+            history: true,
+            center: true,
+
+            theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+            transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+            // Parallax scrolling
+            // parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+            // parallaxBackgroundSize: '2100px 900px',
+
+            // Optional libraries used to extend on reveal.js
+            dependencies: [
+                { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                { src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+                { src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+            ]
+        });
+
+        </script>
+
+    </body>
+</html>
