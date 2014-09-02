@@ -49,12 +49,9 @@ type Person struct {
 	country string
 }
 
-/*
-func (p *Person) String() string {
-	return fmt.Sprintf("%s from %s does some stuff in the %s team",
-        p.name, p.country, p.team)
+func whoAreYou(p *Person) string {
+	return p.name
 }
-*/
 
 type Paylogician3 struct {
 	Person
@@ -94,6 +91,8 @@ func main() {
 
 	egon := Paylogician3{Person{name: "Egon", country: "Nederland"}, OPIT}
 	fmt.Println(&egon)
+
+	// name := whoAreYou(egon)
 
 	wouter := Paylogician3{
 		Person{name: "Wouter", country: "Nederland"}, SERVICES,

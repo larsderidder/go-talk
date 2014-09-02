@@ -388,10 +388,14 @@ func main() {
                     <section>
                         <h2>Embedding != inheritance</h2>
                         <pre><code class="go" contenteditable>
-func (p *Person) String() string {
-    // This won't work, as p.team is undefined for type Person
-    return fmt.Sprintf("%s from %s does some stuff in the %s team", 
-        p.name, p.country, p.team)
+func whoAreYou(p *Person) string {
+    return p.name
+}
+
+func main() {
+    egon := Paylogician3{Person{name: "Egon", country: "Nederland"}, OPIT}
+    // This won't work as a Paylogician3 is not a Person (poor Egon)
+    name = whoAreYou(&egon) // Compile time error
 }
                         </code></pre>
                     </section>
@@ -401,14 +405,14 @@ func (p *Person) String() string {
                     <h2>Interfaces</h2>
                     <pre><code class="go" data-trim contenteditable>
 type Serializer interface {
-	Serialize()
+    Serialize() string
 }
 func (p *Paylogician3) Serialize() string {
     return fmt.Sprintf("{ 'name': '%s', 'country': '%s', 'team': '%s' }", 
         p.name, p.country, p.team)
 }
 func serializeMe(s Serializer) string {
-	return s.Serialize()
+    return s.Serialize()
 }
 func main() {
     wouter := Paylogician3{
